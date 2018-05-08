@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dy.dao.StudentInfoMapper">
+	<resultMap id="BaseResultMap" type="com.dy.bean.StudentInfo">
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="stuinfo_id" jdbcType="VARCHAR" property="stuinfoId" />
+		<result column="stu_week" jdbcType="INTEGER" property="stuWeek" />
+		<result column="stu_weekday" jdbcType="VARCHAR" property="stuWeekday" />
+		<result column="stu_attendance" jdbcType="VARCHAR" property="stuAttendance" />
+		<result column="stu_remark" jdbcType="VARCHAR" property="stuRemark" />
+		<result column="stu_coursename" jdbcType="VARCHAR" property="stuCoursename" />
+	</resultMap>
+	<sql id="Example_Where_Clause">
+		<where>
+			<foreach collection="oredCriteria" item="criteria" separator="or">
+				<if test="criteria.valid">
+					<trim prefix="(" prefixOverrides="and" suffix=")">
+						<foreach collection="criteria.criteria" item="criterion">
+							<choose>
+								<when test="criterion.noValue">and ${criterion.condition}</when>
+								<when test="criterion.singleValue">and ${criterion.condition} #{criterion.value}</when>
+								<when test="criterion.betweenValue">and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}</when>
+								<when test="criterion.listValue">
+									and ${criterion.condition}
+									<foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">#{listItem}</foreach>
+								</when>
+							</choose>
+						</foreach>
+					</trim>
+				</if>
+			</foreach>
+		</where>
+	</sql>
+	<sql id="Update_By_Example_Where_Clause">
+		<where>
+			<foreach collection="example.oredCriteria" item="criteria" separator="or">
+				<if test="criteria.valid">
+					<trim prefix="(" prefixOverrides="and" suffix=")">
+						<foreach collection="criteria.criteria" item="criterion">
+							<choose>
+								<when test="criterion.noValue">and ${criterion.condition}</when>
+								<when test="criterion.singleValue">and ${criterion.condition} #{criterion.value}</when>
+								<when test="criterion.betweenValue">and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}</when>
+								<when test="criterion.listValue">
+									and ${criterion.condition}
+									<foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">#{listItem}</foreach>
+								</when>
+							</choose>
+						</foreach>
+					</trim>
+				</if>
+			</foreach>
+		</where>
+	</sql>
+	<sql id="Base_Column_List">
+		id, stuinfo_id, stu_week, stu_weekday, stu_attendance, stu_remark, stu_coursename
+	</sql>
+	<select id="selectByExample" parameterType="com.dy.bean.StudentInfoExample" resultMap="BaseResultMap">
+		select
+		<if test="distinct">distinct</if>
+		<include refid="Base_Column_List" />
+		from tb_studentinfo
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+		<if test="orderByClause != null">order by ${orderByClause}</if>
+	</select>
+	<select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from tb_studentinfo
+    where id = #{id,jdbcType=INTEGER}
+	</select>
+	
+	<!--根据学号返回详细信息-->
+	<select id="selectByinfoid" parameterType="java.lang.String" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from tb_studentinfo
+    where stuinfo_id = #{stuinfoId,jdbcType=VARCHAR}
+	</select>
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">delete from tb_studentinfo
+    where stuinfo_id = #{stuinfoId,jdbcType=VARCHAR}</delete>
+	<delete id="deleteByExample" parameterType="com.dy.bean.StudentInfoExample">
+		delete from tb_studentinfo
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+	</delete>
+	<insert id="insert" parameterType="com.dy.bean.StudentInfo">
+		insert into tb_studentinfo (id, stuinfo_id, stu_week, stu_weekday, stu_attendance,
+		stu_remark, stu_coursename) values (#{id,jdbcType=INTEGER}, #{stuinfoId,jdbcType=VARCHAR},
+		#{stuWeek,jdbcType=INTEGER}, #{stuWeekday,jdbcType=VARCHAR}, #{stuAttendance,jdbcType=VARCHAR},
+		#{stuRemark,jdbcType=VARCHAR}, #{stuCoursename,jdbcType=VARCHAR})
+	</insert>
+	<insert id="insertSelective" parameterType="com.dy.bean.StudentInfo">
+		insert into tb_studentinfo
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">id,</if>
+			<if test="stuinfoId != null">stuinfo_id,</if>
+			<if test="stuWeek != null">stu_week,</if>
+			<if test="stuWeekday != null">stu_weekday,</if>
+			<if test="stuAttendance != null">stu_attendance,</if>
+			<if test="stuRemark != null">stu_remark,</if>
+			<if test="stuCoursename != null">stu_coursename,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">#{id,jdbcType=INTEGER},</if>
+			<if test="stuinfoId != null">#{stuinfoId,jdbcType=VARCHAR},</if>
+			<if test="stuWeek != null">#{stuWeek,jdbcType=INTEGER},</if>
+			<if test="stuWeekday != null">#{stuWeekday,jdbcType=VARCHAR},</if>
+			<if test="stuAttendance != null">#{stuAttendance,jdbcType=VARCHAR},</if>
+			<if test="stuRemark != null">#{stuRemark,jdbcType=VARCHAR},</if>
+			<if test="stuCoursename != null">#{stuCoursename,jdbcType=VARCHAR},</if>
+		</trim>
+	</insert>
+	<select id="countByExample" parameterType="com.dy.bean.StudentInfoExample" resultType="java.lang.Long">
+		select count(*) from tb_studentinfo
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+	</select>
+	<update id="updateByExampleSelective" parameterType="map">
+		update tb_studentinfo
+		<set>
+			<if test="record.id != null">id = #{record.id,jdbcType=INTEGER},</if>
+			<if test="record.stuinfoId != null">stuinfo_id = #{record.stuinfoId,jdbcType=VARCHAR},</if>
+			<if test="record.stuWeek != null">stu_week = #{record.stuWeek,jdbcType=INTEGER},</if>
+			<if test="record.stuWeekday != null">stu_weekday = #{record.stuWeekday,jdbcType=VARCHAR},</if>
+			<if test="record.stuAttendance != null">stu_attendance = #{record.stuAttendance,jdbcType=VARCHAR},</if>
+			<if test="record.stuRemark != null">stu_remark = #{record.stuRemark,jdbcType=VARCHAR},</if>
+			<if test="record.stuCoursename != null">stu_coursename = #{record.stuCoursename,jdbcType=VARCHAR},</if>
+		</set>
+		<if test="_parameter != null">
+			<include refid="Update_By_Example_Where_Clause" />
+		</if>
+	</update>
+	<update id="updateByExample" parameterType="map">
+		update tb_studentinfo set id = #{record.id,jdbcType=INTEGER}, stuinfo_id = #{record.stuinfoId,jdbcType=VARCHAR},
+		stu_week = #{record.stuWeek,jdbcType=INTEGER}, stu_weekday = #{record.stuWeekday,jdbcType=VARCHAR},
+		stu_attendance = #{record.stuAttendance,jdbcType=VARCHAR}, stu_remark = #{record.stuRemark,jdbcType=VARCHAR},
+		stu_coursename = #{record.stuCoursename,jdbcType=VARCHAR}
+		<if test="_parameter != null">
+			<include refid="Update_By_Example_Where_Clause" />
+		</if>
+	</update>
+	<update id="updateByPrimaryKeySelective" parameterType="com.dy.bean.StudentInfo">
+		update tb_studentinfo
+		<set>
+			<if test="stuWeek != null">stu_week = #{stuWeek,jdbcType=INTEGER},</if>
+			<if test="stuWeekday != null">stu_weekday = #{stuWeekday,jdbcType=VARCHAR},</if>
+			<if test="stuAttendance != null">stu_attendance = #{stuAttendance,jdbcType=VARCHAR},</if>
+			<if test="stuRemark != null">stu_remark = #{stuRemark,jdbcType=VARCHAR},</if>
+			<if test="stuCoursename != null">stu_coursename = #{stuCoursename,jdbcType=VARCHAR},</if>
+		</set>
+		where stuinfo_id = #{stuinfoId,jdbcType=VARCHAR}
+	</update>
+	
+	<!--修改出勤状态-->
+	<update id="updateAttendance" parameterType="com.dy.bean.Student">
+		update tb_studentinfo set stu_week = #{arg1,jdbcType=INTEGER}, stu_weekday
+		= #{arg2,jdbcType=VARCHAR}, stu_attendance = #{arg3,jdbcType=VARCHAR},
+		stu_remark = #{arg4,jdbcType=VARCHAR}, stu_coursename = #{arg5,jdbcType=VARCHAR}
+		where stuinfo_id = #{arg0,jdbcType=VARCHAR}
+	</update>
+</mapper>

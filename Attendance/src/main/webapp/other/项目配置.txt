@@ -1,0 +1,5 @@
+本系统使用的是Eclipse创建的Maven项目
+配置：jdk8.0 32位；tomcat8.5
+将ZKOnline.ocx放C:/window/system32目录下，然后在控制台输入regsvr32 ZKOline.ocx注册该控件，
+成功后，安装fingerprint Online SDK；
+将Match.dll文件放入classpath下，导入jna.jar包即可运行。

@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dy.dao.StudentMapper">
+	<resultMap id="BaseResultMap" type="com.dy.bean.Student">
+		<id column="stu_id" jdbcType="VARCHAR" property="stuId" />
+		<result column="stu_name" jdbcType="VARCHAR" property="stuName" />
+		<result column="stu_password" jdbcType="VARCHAR" property="stuPassword" />
+		<result column="stu_registerdate" jdbcType="VARCHAR" property="stuRegisterdate" />
+		<result column="stu_classname" jdbcType="VARCHAR" property="stuClassname" />
+	</resultMap>
+
+	<!-- 包含学生详细信息的集合 -->
+	<resultMap id="AllResultMap" type="com.dy.bean.Student">
+		<id column="stu_id" jdbcType="VARCHAR" property="stuId" />
+		<result column="stu_name" jdbcType="VARCHAR" property="stuName" />
+		<result column="stu_password" jdbcType="VARCHAR" property="stuPassword" />
+		<result column="stu_registerdate" jdbcType="VARCHAR" property="stuRegisterdate" />
+		<result column="stu_classname" jdbcType="VARCHAR" property="stuClassname" />
+		<association javaType="com.dy.bean.StudentInfo" property="stuinfo">
+			<id column="id" jdbcType="INTEGER" property="id" />
+			<result column="stuinfo_id" jdbcType="VARCHAR" property="stuinfoId" />
+			<result column="stu_week" jdbcType="INTEGER" property="stuWeek" />
+			<result column="stu_weekday" jdbcType="VARCHAR" property="stuWeekday" />
+			<result column="stu_attendance" jdbcType="VARCHAR" property="stuAttendance" />
+			<result column="stu_remark" jdbcType="VARCHAR" property="stuRemark" />
+			<result column="stu_coursename" jdbcType="VARCHAR" property="stuCoursename" />
+		</association>
+	</resultMap>
+
+	<resultMap extends="BaseResultMap" id="ResultMapWithBLOBs"
+		type="com.dy.bean.Student">
+		<result column="stu_fingerprint" jdbcType="VARCHAR"
+			property="stuFingerprint" />
+	</resultMap>
+	<sql id="Example_Where_Clause">
+		<where>
+			<foreach collection="oredCriteria" item="criteria" separator="or">
+				<if test="criteria.valid">
+					<trim prefix="(" prefixOverrides="and" suffix=")">
+						<foreach collection="criteria.criteria" item="criterion">
+							<choose>
+								<when test="criterion.noValue">
+									and ${criterion.condition}
+								</when>
+								<when test="criterion.singleValue">
+									and ${criterion.condition} #{criterion.value}
+								</when>
+								<when test="criterion.betweenValue">
+									and ${criterion.condition} #{criterion.value}
+									and
+									#{criterion.secondValue}
+								</when>
+								<when test="criterion.listValue">
+									and ${criterion.condition}
+									<foreach close=")" collection="criterion.value" item="listItem"
+										open="(" separator=",">
+										#{listItem}
+									</foreach>
+								</when>
+							</choose>
+						</foreach>
+					</trim>
+				</if>
+			</foreach>
+		</where>
+	</sql>
+	<sql id="Update_By_Example_Where_Clause">
+		<where>
+			<foreach collection="example.oredCriteria" item="criteria"
+				separator="or">
+				<if test="criteria.valid">
+					<trim prefix="(" prefixOverrides="and" suffix=")">
+						<foreach collection="criteria.criteria" item="criterion">
+							<choose>
+								<when test="criterion.noValue">
+									and ${criterion.condition}
+								</when>
+								<when test="criterion.singleValue">
+									and ${criterion.condition} #{criterion.value}
+								</when>
+								<when test="criterion.betweenValue">
+									and ${criterion.condition} #{criterion.value}
+									and
+									#{criterion.secondValue}
+								</when>
+								<when test="criterion.listValue">
+									and ${criterion.condition}
+									<foreach close=")" collection="criterion.value" item="listItem"
+										open="(" separator=",">
+										#{listItem}
+									</foreach>
+								</when>
+							</choose>
+						</foreach>
+					</trim>
+				</if>
+			</foreach>
+		</where>
+	</sql>
+	<sql id="Base_Column_List">
+		stu_id, stu_name, stu_password, stu_registerdate,
+		stu_classname,stu_fingerprint
+	</sql>
+
+	<sql id="All_Column_List">
+		stu_name, stu_classname, stu_week,
+		stu_weekday,stu_fingerprint,
+		stu_attendance, stu_remark, stu_coursename,stuinfo_id
+	</sql>
+	<sql id="Blob_Column_List">
+		stu_fingerprint
+	</sql>
+	<!-- 查询带详细信息的学生 -->
+	<select id="selectWithStudent" resultMap="AllResultMap">
+		select stu_name, stu_classname, stu_week,
+		stu_weekday,stu_fingerprint,
+		stu_attendance, stu_remark, stu_coursename,stuinfo_id
+		from tb_student LEFT JOIN tb_studentinfo on
+		tb_student.stu_id=tb_studentinfo.stuinfo_id
+		WHERE
+		tb_student.stu_classname=#{arg0,jdbcType=VARCHAR}
+		and
+		tb_studentinfo.stu_weekday=#{arg1,jdbcType=VARCHAR}
+		and
+		tb_studentinfo.stu_week=#{arg2,jdbcType=INTEGER}
+		and
+		tb_studentinfo.stu_coursename=#{arg3,jdbcType=VARCHAR}
+	</select>
+
+	<!-- 按照班级名查询返回 -->
+	<select id="selectbyClassnameWithinfo" resultMap="AllResultMap">
+		select
+		<include refid="All_Column_List" />
+		from tb_student LEFT JOIN tb_studentinfo on
+		tb_student.stu_id=tb_studentinfo.stuinfo_id
+		where
+		tb_studentinfo.stu_attendance=#{arg0,jdbcType=VARCHAR} AND
+		tb_student.stu_classname = #{arg1,jdbcType=VARCHAR}
+	</select>
+
+	<!-- 按照课程名查询返回 -->
+	<select id="selectbyCoursenameWithinfo" resultMap="AllResultMap">
+		select
+		<include refid="All_Column_List" />
+		from tb_student LEFT JOIN tb_studentinfo on
+		tb_student.stu_id=tb_studentinfo.stuinfo_id
+		where
+		tb_studentinfo.stu_attendance=#{arg0,jdbcType=VARCHAR} AND
+		tb_studentinfo.stu_coursename= #{arg1,jdbcType=VARCHAR}
+	</select>
+
+	<!-- 按照课程名及班级名查询返回 -->
+	<select id="selectbyCoursenameandClassnameWithinfo" resultMap="AllResultMap">
+		select
+		<include refid="All_Column_List" />
+		from tb_student LEFT JOIN tb_studentinfo on
+		tb_student.stu_id=tb_studentinfo.stuinfo_id
+		where
+		tb_studentinfo.stu_attendance=#{arg0,jdbcType=VARCHAR} AND
+		tb_student.stu_classname = #{arg1,jdbcType=VARCHAR} AND
+		tb_studentinfo.stu_coursename= #{arg2,jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectByExampleWithBLOBs" parameterType="com.dy.bean.StudentExample"
+		resultMap="ResultMapWithBLOBs">
+		select
+		<if test="distinct">
+			distinct
+		</if>
+		<include refid="Base_Column_List" />
+		,
+		<include refid="Blob_Column_List" />
+		from tb_student
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+		<if test="orderByClause != null">
+			order by ${orderByClause}
+		</if>
+	</select>
+	<select id="selectByExample" parameterType="com.dy.bean.StudentExample"
+		resultMap="BaseResultMap">
+		select
+		<if test="distinct">
+			distinct
+		</if>
+		<include refid="Base_Column_List" />
+		from tb_student
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+		<if test="orderByClause != null">
+			order by ${orderByClause}
+		</if>
+	</select>
+
+	<select id="selectByPrimaryKey" parameterType="java.lang.String"
+		resultMap="ResultMapWithBLOBs">
+		select
+		<include refid="Base_Column_List" />
+		,
+		<include refid="Blob_Column_List" />
+		from tb_student
+		where stu_id = #{stuId,jdbcType=VARCHAR}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from
+		tb_student
+		where stu_id = #{stuId,jdbcType=VARCHAR}
+	</delete>
+	<delete id="deleteByExample" parameterType="com.dy.bean.StudentExample">
+		delete from tb_student
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+	</delete>
+	<insert id="insert" parameterType="com.dy.bean.Student">
+		insert into tb_student
+		(stu_id, stu_name, stu_password,
+		stu_registerdate, stu_classname,
+		stu_fingerprint
+		)
+		values (#{stuId,jdbcType=VARCHAR},
+		#{stuName,jdbcType=VARCHAR},
+		#{stuPassword,jdbcType=VARCHAR},
+		#{stuRegisterdate,jdbcType=VARCHAR}, #{stuClassname,jdbcType=VARCHAR},
+		#{stuFingerprint,jdbcType=VARCHAR}
+		)
+	</insert>
+	<insert id="insertSelective" parameterType="com.dy.bean.Student">
+		insert into tb_student
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="stuId != null">
+				stu_id,
+			</if>
+			<if test="stuName != null">
+				stu_name,
+			</if>
+			<if test="stuPassword != null">
+				stu_password,
+			</if>
+			<if test="stuRegisterdate != null">
+				stu_registerdate,
+			</if>
+			<if test="stuClassname != null">
+				stu_classname,
+			</if>
+			<if test="stuFingerprint != null">
+				stu_fingerprint,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="stuId != null">
+				#{stuId,jdbcType=VARCHAR},
+			</if>
+			<if test="stuName != null">
+				#{stuName,jdbcType=VARCHAR},
+			</if>
+			<if test="stuPassword != null">
+				#{stuPassword,jdbcType=VARCHAR},
+			</if>
+			<if test="stuRegisterdate != null">
+				#{stuRegisterdate,jdbcType=VARCHAR},
+			</if>
+			<if test="stuClassname != null">
+				#{stuClassname,jdbcType=VARCHAR},
+			</if>
+			<if test="stuFingerprint != null">
+				#{stuFingerprint,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+	<select id="countByExample" parameterType="com.dy.bean.StudentExample"
+		resultType="java.lang.Long">
+		select count(*) from tb_student
+		<if test="_parameter != null">
+			<include refid="Example_Where_Clause" />
+		</if>
+	</select>
+	<update id="updateByExampleSelective" parameterType="map">
+		update tb_student
+		<set>
+			<if test="record.stuId != null">
+				stu_id = #{record.stuId,jdbcType=VARCHAR},
+			</if>
+			<if test="record.stuName != null">
+				stu_name = #{record.stuName,jdbcType=VARCHAR},
+			</if>
+			<if test="record.stuPassword != null">
+				stu_password = #{record.stuPassword,jdbcType=VARCHAR},
+			</if>
+			<if test="record.stuRegisterdate != null">
+				stu_registerdate =
+				#{record.stuRegisterdate,jdbcType=VARCHAR},
+			</if>
+			<if test="record.stuClassname != null">
+				stu_classname = #{record.stuClassname,jdbcType=VARCHAR},
+			</if>
+			<if test="record.stuFingerprint != null">
+				stu_fingerprint =
+				#{record.stuFingerprint,jdbcType=VARCHAR},
+			</if>
+		</set>
+		<if test="_parameter != null">
+			<include refid="Update_By_Example_Where_Clause" />
+		</if>
+	</update>
+	<update id="updateByExampleWithBLOBs" parameterType="map">
+		update tb_student
+		set stu_id = #{record.stuId,jdbcType=VARCHAR},
+		stu_name = #{record.stuName,jdbcType=VARCHAR},
+		stu_password =
+		#{record.stuPassword,jdbcType=VARCHAR},
+		stu_registerdate =
+		#{record.stuRegisterdate,jdbcType=VARCHAR},
+		stu_classname =
+		#{record.stuClassname,jdbcType=VARCHAR},
+		stu_fingerprint =
+		#{record.stuFingerprint,jdbcType=VARCHAR}
+		<if test="_parameter != null">
+			<include refid="Update_By_Example_Where_Clause" />
+		</if>
+	</update>
+	<update id="updateByExample" parameterType="map">
+		update tb_student
+		set stu_id = #{record.stuId,jdbcType=VARCHAR},
+		stu_name = #{record.stuName,jdbcType=VARCHAR},
+		stu_password =
+		#{record.stuPassword,jdbcType=VARCHAR},
+		stu_registerdate =
+		#{record.stuRegisterdate,jdbcType=VARCHAR},
+		stu_classname =
+		#{record.stuClassname,jdbcType=VARCHAR}
+		<if test="_parameter != null">
+			<include refid="Update_By_Example_Where_Clause" />
+		</if>
+	</update>
+	<update id="updateByPrimaryKeySelective" parameterType="com.dy.bean.Student">
+		update tb_student
+		<set>
+			<if test="stuName != null">
+				stu_name = #{stuName,jdbcType=VARCHAR},
+			</if>
+			<if test="stuPassword != null">
+				stu_password = #{stuPassword,jdbcType=VARCHAR},
+			</if>
+			<if test="stuRegisterdate != null">
+				stu_registerdate = #{stuRegisterdate,jdbcType=VARCHAR},
+			</if>
+			<if test="stuClassname != null">
+				stu_classname = #{stuClassname,jdbcType=VARCHAR},
+			</if>
+			<if test="stuFingerprint != null">
+				stu_fingerprint =
+				#{stuFingerprint,jdbcType=VARCHAR},
+			</if>
+		</set>
+		where stu_id = #{stuId,jdbcType=VARCHAR}
+	</update>
+	<update id="updateByPrimaryKeyWithBLOBs" parameterType="com.dy.bean.Student">
+		update
+		tb_student
+		set stu_name = #{stuName,jdbcType=VARCHAR},
+		stu_password =
+		#{stuPassword,jdbcType=VARCHAR},
+		stu_registerdate =
+		#{stuRegisterdate,jdbcType=VARCHAR},
+		stu_classname =
+		#{stuClassname,jdbcType=VARCHAR},
+		stu_fingerprint =
+		#{stuFingerprint,jdbcType=VARCHAR}
+		where stu_id =
+		#{stuId,jdbcType=VARCHAR}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.dy.bean.Student">
+		update tb_student
+		set stu_name = #{stuName,jdbcType=VARCHAR},
+		stu_password =
+		#{stuPassword,jdbcType=VARCHAR},
+		stu_classname =
+		#{stuClassname,jdbcType=VARCHAR}
+		where stu_id =
+		#{stuId,jdbcType=VARCHAR}
+	</update>
+	<!-- 指纹采集 -->
+	<update id="updateById" parameterType="com.dy.bean.Student">
+		update tb_student
+		set stu_fingerprint =
+		#{arg1,jdbcType=VARCHAR}
+		where stu_id =
+		#{arg0,jdbcType=VARCHAR}
+	</update>
+</mapper>
